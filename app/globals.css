@@ -1,26 +1,188 @@
 @import "tailwindcss";
 
+/* ============================================================
+   VistaRail — Design tokens
+   Light "liquid glass" UI tuned to harmonize with the daytime
+   scenery of the hero video. Whisper-quiet warm accent.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Deep, elegant base shown before the video paints (no white flash) */
+  --background: #06080c;
+  --foreground: #f4f7fb;
+
+  /* Premium easings (used by CSS transitions; JS mirrors these) */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1); /* smooth, expressive deceleration */
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Liquid glass */
+  --glass-bg: rgba(255, 255, 255, 0.09);
+  --glass-bg-strong: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --glass-highlight: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 14px 50px -12px rgba(6, 12, 24, 0.45);
+
+  /* Whisper-quiet warm accent (a hint of luxury, used sparingly) */
+  --accent: #e8cd93;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   Night mode — the same liquid glass, dimmed and warmed.
+   Panels darken slightly while staying transparent; reflections
+   lift a touch; typography stays bright. Driven by [data-mode] on
+   <html> so every glass surface re-themes together, and the
+   transition on .glass keeps it in step with the video crossfade.
+   ============================================================ */
+[data-mode="night"] {
+  --background: #04060a;
+
+  --glass-bg: rgba(12, 16, 30, 0.34);
+  --glass-bg-strong: rgba(14, 18, 34, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.26);
+  --glass-highlight: rgba(255, 255, 255, 0.58);
+  --glass-shadow: 0 18px 60px -14px rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------------------------------------------ */
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  min-height: 100%;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  font-feature-settings: "ss01", "cv01", "cv11";
+}
+
+::selection {
+  background: rgba(232, 205, 147, 0.28);
+  color: #fff;
+}
+
+/* Refined, unobtrusive focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Slim, elegant scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+  background-clip: padding-box;
+}
+
+/* ============================================================
+   Lenis smooth scroll — recommended base styles
+   ============================================================ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ============================================================
+   Liquid glass surfaces
+   ============================================================ */
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  backdrop-filter: blur(22px) saturate(155%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.06);
+  /* Slow props (bg/border/shadow) ride the day↔night crossfade; color is
+     fast so hover/text brighten stays snappy. Hover/focus intentionally
+     avoid bg/border so they never collide with the theme transition. */
+  transition: background-color 1.6s var(--ease-premium),
+    border-color 1.6s var(--ease-premium), box-shadow 1.6s var(--ease-premium),
+    color 0.3s var(--ease-soft);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  backdrop-filter: blur(26px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: background-color 1.6s var(--ease-premium),
+    border-color 1.6s var(--ease-premium), box-shadow 1.6s var(--ease-premium),
+    color 0.3s var(--ease-soft);
+}
+
+/* Bright, near-solid "liquid" surface for the primary CTA — reads as
+   frosted crystal over any part of the video, with strong contrast. */
+.glass-bright {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(244, 247, 251, 0.92) 100%
+  );
+  box-shadow: 0 12px 34px -10px rgba(6, 12, 24, 0.55),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Soft legibility shadow so white type stays crisp over bright frames */
+.text-shadow-soft {
+  text-shadow: 0 1px 24px rgba(6, 12, 24, 0.35), 0 1px 3px rgba(6, 12, 24, 0.22);
+}
+.text-shadow-subtle {
+  text-shadow: 0 1px 12px rgba(6, 12, 24, 0.28);
+}
+
+/* Sits under animated elements to promote them to their own layer */
+.will-animate {
+  will-change: transform, opacity, filter;
+}
+
+/* ============================================================
+   Accessibility — honor reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

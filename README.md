@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VistaRail
 
-## Getting Started
+A cinematic, Awwwards-caliber landing page for a luxury scenic-rail brand. The
+hero is built **around a user-provided Runway video** — the video is the
+centerpiece and is rendered exactly as supplied (full-bleed, never re-encoded,
+cropped, or zoomed).
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, Turbopack) · **React 19** · **TypeScript**
+- **Tailwind CSS v4** — design tokens + liquid-glass utilities in `app/globals.css`
+- **Framer Motion** — cinematic entrance choreography, mouse parallax, hover feel
+- **Lenis** — global smooth scrolling (reduced-motion aware)
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  layout.tsx        Fonts (Geist), metadata + viewport, <SmoothScroll> wrapper
+  page.tsx          Navbar · Hero · Prelude · Footer
+  globals.css       Design tokens, .glass surfaces, Lenis + reduced-motion base
+  icon.svg          Branded favicon
+components/
+  Navbar.tsx        Glass nav — brand · centered links · "Switch to Night"
+  Hero.tsx          Entrance choreography + mouse parallax orchestrator
+  HeroVideo.tsx     The uploaded video (object-cover, untouched) + legibility scrims
+  ScrollCue.tsx     Quiet scroll invitation that fades on scroll
+  Prelude.tsx       One restrained editorial beat, revealed on scroll
+  Footer.tsx
+  SmoothScroll.tsx  Lenis smooth-scroll provider
+  ui/Button.tsx     Reusable animated button (primary / glass)
+  ui/SearchField.tsx
+  icons.tsx         Inline SVG icon set
+lib/
+  motion.ts         Easings, springs, and the entrance timing (single source of truth)
+public/
+  videos/vistarail-hero.mp4   ← the hero video
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## The hero video
 
-## Learn More
+`public/videos/vistarail-hero.mp4` is a verbatim copy of the uploaded file. To
+swap it, replace that file (keep the name) or update the `src` in
+`components/HeroVideo.tsx`.
 
-To learn more about Next.js, take a look at the following resources:
+## Phase 2 (not yet implemented)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The **"Switch to Night"** button in the navbar is intentionally inert. When the
+nighttime Runway video is provided, it will drive a seamless day → night
+transition (background video, hero content, ambient lighting, and UI). The
+timing system in `lib/motion.ts` and the glass tokens in `globals.css` are built
+to extend into that theme.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Accessibility & performance
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Honors `prefers-reduced-motion` (parallax and entrance motion collapse to
+  simple fades; Lenis falls back to native scroll).
+- Animates only `transform` / `opacity` / `filter`; content is statically
+  prerendered.
+- Keyboard focus rings, `aria-label`s on icon controls, and semantic landmarks.
